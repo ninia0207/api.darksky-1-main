@@ -35,6 +35,7 @@ namespace Weather.API
                 double lng = default;
                 double lat = default;
                 int userLoc = default;
+
                 if (!isCitiesExsists)
                 {
                     Console.Write("Enter lng: ");
@@ -60,8 +61,10 @@ namespace Weather.API
                         Console.WriteLine(item.Id + ". " + item.CityName);
                     }
 
-                    Console.WriteLine((citiesArray.LastOrDefault().Id + 1) + ". Clear History ");
+                    
 
+                    Console.WriteLine((citiesArray.LastOrDefault().Id + 1) + ". Clear History ");
+                    
 
                     var cityChoice = int.TryParse(Console.ReadLine(), out int cityId);
                     var currentCity = citiesArray.FirstOrDefault(o => o.Id == cityId);
@@ -73,13 +76,13 @@ namespace Weather.API
                         configuration.DeleteConfig("cities.json");
                         continue;
                     }
-
+                    configuration.SetConfigFileName("config.json");
+                    
                     lng = currentCity.Lng;
                     lat = currentCity.Lat;
                 }
 
-                configuration.SetConfigFileName("config.json");
-
+                
 
                 string userLang = default;
                 int choiceCorF = default;
