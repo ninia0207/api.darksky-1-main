@@ -144,14 +144,18 @@ namespace Weather.API
                 IConfiguration citConfiguration = new Configuration("cities.json");
                 if (userLoc == 1)
                 {
-                    var citiesConfig = new City()
+                    var citiesConfig = new City[]
                     {
+                        new City
+                        {
                         Id = 1,
-                        CityName = $"{weatherInfo.Timezone}", 
-                        Lng = weatherInfo.Longitude, 
+                        CityName = $"{weatherInfo.Timezone}",
+                        Lng = weatherInfo.Longitude,
                         Lat = weatherInfo.Latitude
+                        }
+                        
                     };
-                    citConfiguration.SetConfigs(citiesConfig);
+                    citConfiguration.SetCityConfigs(citiesConfig);
                 }
 
                 

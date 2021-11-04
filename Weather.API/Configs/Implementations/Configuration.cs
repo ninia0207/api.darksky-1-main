@@ -60,6 +60,24 @@ namespace Configs.Implementations
             }
         }
 
+        public bool SetCityConfigs(IConfig[] config)
+        {
+            try
+            {
+                using (StreamWriter sw = new StreamWriter(_path))
+                {
+                    var json = JsonConvert.SerializeObject(config);
+                    sw.Write(json);
+
+                    sw.Close();
+                    return true;
+                }
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
+        }
         public bool IsConfigExsists()
         {
             using (StreamReader sr = new StreamReader(_path))

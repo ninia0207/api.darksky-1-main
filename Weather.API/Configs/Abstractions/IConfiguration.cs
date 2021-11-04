@@ -1,5 +1,4 @@
 ﻿using Configs.Models.Abstractions;
-
 namespace Configs.Abstractions
 {
     public interface IConfiguration
@@ -7,6 +6,7 @@ namespace Configs.Abstractions
         public bool IsConfigExsists();
 
         public bool SetConfigs(IConfig config);
+        public bool SetCityConfigs(IConfig[] config);
         public string GetConfigs();
 
         public bool DeleteConfig(string path);

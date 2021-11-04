@@ -9,5 +9,6 @@ namespace Weather.API.WeatherConfig
 
         public string Lang { get; set; }
         public TempChoice CorF { get; set; }
+
     }
 }
