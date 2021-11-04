@@ -1,7 +1,7 @@
 ﻿using Configs.Models.Abstractions;
 using Weather.PCL.Models.Enums;
 
-namespace Weather.API.WeatherConfig
+namespace Weather.PCL
 {
     public class WeatherConfig : IConfig
     {

@@ -5,8 +5,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Models\Implementations\" />
     <Folder Include="Configs\" />
+    <Folder Include="WeatherConfig\" />
   </ItemGroup>
 
   <ItemGroup>
