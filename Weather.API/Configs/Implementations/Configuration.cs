@@ -8,7 +8,7 @@ namespace Configs.Implementations
 {
     public class Configuration : IConfiguration
     {
-        private string _rootPath = @"C:\Users\ninia\OneDrive\Documents\GitHub\api.darksky-1-main\Weather.API\Configs\Configs\";
+        private string _rootPath = @"C:\Users\davit\OneDrive\Desktop\api.darksky-1-main\Weather.API\Configs\Configs\";
 
         private string _path;
 

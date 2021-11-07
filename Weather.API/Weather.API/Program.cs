@@ -2,7 +2,9 @@
 using Configs.Implementations;
 using Newtonsoft.Json;
 using System;
+using System.Diagnostics;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using Weather.PCL.Abstractions;
@@ -12,23 +14,86 @@ using Weather.PCL.Models.Implementations;
 
 namespace Weather.API
 {
+
+
+    //string userLang = default;
+    //int choiceCorF = default;
+
+    //if (!configuration.IsConfigExsists())
+    //{
+    //    Console.WriteLine("1. Celcius");
+    //    Console.WriteLine("2. Farenheit");
+    //    Console.Write("Your Choice: ");
+    //    var userChoice = int.TryParse(Console.ReadLine(), out choiceCorF);
+    //    if (!userChoice || choiceCorF > 2) continue;
+    //    db.ChoiceCorF((TempChoice)choiceCorF);
+
+    //    Console.Write("Enter the language(use abbreviation like english = en): ");
+    //    userLang = Console.ReadLine();
+    //    if (userLang.Length > 2) continue;
+
+    //    var weatherConfig = new WeatherConfig.WeatherConfig()
+    //    {
+    //        Id = 1,
+    //        Lang = userLang,
+    //        CorF = (TempChoice)choiceCorF
+    //    };
+
+    //    configuration.SetConfigs(weatherConfig);
+    //}
+    //else
+    //{
+    //    var confStr = configuration.GetConfigs();
+    //    var confObj = JsonConvert.DeserializeObject<WeatherConfig.WeatherConfig>(confStr);
+    //    userLang = confObj.Lang;
+    //    choiceCorF = (int)confObj.CorF;
+    //}
+
     class Program
     {
         static async Task Main(string[] args)
         {
             Console.OutputEncoding = Encoding.UTF8;
 
-            IDataBase db = new DataBase();
+            CultureSettings culture = new CultureSettings();
+
+            IImagesService imageService = new ImagesService();
+
             //41.716667
             //44.783333
 
             do
             {
-                IConfiguration configuration = new Configuration("config.json");
+                if (!culture.IsInited)
+                {
+                    Console.WriteLine("1. Celcius");
+                    Console.WriteLine("2. Farenheit");
+                    Console.Write("Your Choice: ");
+                    int choiceCorF = default;
+                    var userChoice = int.TryParse(Console.ReadLine(), out choiceCorF);
+                    if (!userChoice || choiceCorF > 2) continue;
+                    culture.ChoiceCorF((TempChoice)choiceCorF);
 
-                configuration.SetConfigFileName("cities.json");
+                    Console.Write("Enter the language(use abbreviation like english = en): ");
+                    string userLang = default;
+                    userLang = Console.ReadLine();
+                    if (userLang.Length > 2) continue;
+                    culture.SetLanguage(userLang);
 
-                var isCitiesExsists = configuration.IsConfigExsists();
+                    Console.WriteLine("1. mil");
+                    Console.WriteLine("2. meter");
+                    Console.Write("Your Choice: ");
+                    var isSuccesskmOrMi = int.TryParse(Console.ReadLine(), out int kmOrMi);
+                    culture.ChoiceMiorKM((MetersOrMiles)kmOrMi);
+
+                    culture.SaveChanges();
+                }
+
+                IDataBase db = new DataBase(culture);
+
+                culture.configuration.SetConfigFileName("cities.json");
+
+                var isCitiesExsists = culture.configuration.IsConfigExsists();
 
                 bool isCorrectLng = false;
                 bool isCorrectLat = false;
@@ -53,7 +118,7 @@ namespace Weather.API
                 }
                 else
                 {
-                    var citiesJson = configuration.GetConfigs();
+                    var citiesJson = culture.configuration.GetConfigs();
                     var citiesArray = JsonConvert.DeserializeObject<City[]>(citiesJson);
 
                     foreach (var item in citiesArray)
@@ -61,10 +126,7 @@ namespace Weather.API
                         Console.WriteLine(item.Id + ". " + item.CityName);
                     }
 
-                    
-
                     Console.WriteLine((citiesArray.LastOrDefault().Id + 1) + ". Clear History ");
-                    
 
                     var cityChoice = int.TryParse(Console.ReadLine(), out int cityId);
                     var currentCity = citiesArray.FirstOrDefault(o => o.Id == cityId);
@@ -72,74 +134,33 @@ namespace Weather.API
                     if(currentCity is null)
                     {
                         Console.Clear();
-                        configuration.DeleteConfig("config.json");
-                        configuration.DeleteConfig("cities.json");
+                        culture.configuration.DeleteConfig("config.json");
+                        culture.configuration.DeleteConfig("cities.json");
                         continue;
                     }
-                    configuration.SetConfigFileName("config.json");
+
+                    culture.configuration.SetConfigFileName("config.json");
                     
                     lng = currentCity.Lng;
                     lat = currentCity.Lat;
                 }
 
-                
-
-                string userLang = default;
-                int choiceCorF = default;
-
-                if (!configuration.IsConfigExsists())
-                {
-                    Console.WriteLine("1. Celcius");
-                    Console.WriteLine("2. Farenheit");
-                    Console.Write("Your Choice: ");
-                    var userChoice = int.TryParse(Console.ReadLine(), out choiceCorF);
-                    if (!userChoice || choiceCorF > 2) continue;
-                    db.ChoiceCorF((TempChoice)choiceCorF);
-
-                    Console.Write("Enter the language(use abbreviation like english = en): ");
-                    userLang = Console.ReadLine();
-                    if (userLang.Length > 2) continue;
-
-                    var weatherConfig = new WeatherConfig.WeatherConfig()
-                    {
-                        Id = 1,
-                        Lang = userLang,
-                        CorF = (TempChoice)choiceCorF
-                    };
-
-                    configuration.SetConfigs(weatherConfig);
-                }
-                else
-                {
-                    var confStr = configuration.GetConfigs();
-                    var confObj = JsonConvert.DeserializeObject<WeatherConfig.WeatherConfig>(confStr);
-                    userLang = confObj.Lang;
-                    choiceCorF = (int)confObj.CorF;
-                }
-
                 Console.Clear();
                 Console.WriteLine("Loading...");
-                var weatherInfo = await db.GetWeatherDataByLngAndLat(lat, lng, userLang);
+                var weatherInfo = await db.GetWeatherDataByLngAndLat(lat, lng, culture.LanguageCode);
                 Console.Clear();
 
                 Console.WriteLine($"Longitude: {weatherInfo.Longitude}  Latitude: {weatherInfo.Latitude}");
                 Console.WriteLine($"Timezone: {weatherInfo.Timezone}");
                 Console.WriteLine($"Summary: {weatherInfo.Currently.Summary}");
-                char tempChoice;
-                TempChoice userTempChoice = (TempChoice)choiceCorF;
-                if (userTempChoice == TempChoice.C)
-                {
-                    tempChoice = 'C';
-                }
-                else
-                {
-                    tempChoice = 'F';
-                }
-                Console.WriteLine($"Temperature: {(int)weatherInfo.Currently.ApparentTemperature} °{tempChoice}");
+
+                Console.WriteLine($"Temperature: {(int)weatherInfo.Currently.ApparentTemperature} °{culture.Temperature.ToString()[0]}");
                 Console.WriteLine($"Rain Probability: {weatherInfo.Currently.PrecipProbability}");
                 Console.WriteLine($"Wind Speed: {weatherInfo.Currently.WindSpeed} m/s");
                 Console.WriteLine($"Daily Summary: {weatherInfo.Daily.Summary}");
                 Console.WriteLine($"Hourly Summary: {weatherInfo.Hourly.Summary}");
+
+                imageService.OpenImage(weatherInfo.Currently.Icon);
 
                 IConfiguration citConfiguration = new Configuration("cities.json");
                 if (userLoc == 1)
@@ -148,17 +169,17 @@ namespace Weather.API
                     {
                         new City
                         {
-                        Id = 1,
-                        CityName = $"{weatherInfo.Timezone}",
-                        Lng = weatherInfo.Longitude,
-                        Lat = weatherInfo.Latitude
+                            Id = 1,
+                            CityName = $"{weatherInfo.Timezone}",
+                            Lng = weatherInfo.Longitude,
+                            Lat = weatherInfo.Latitude
                         }
-                        
+
                     };
                     citConfiguration.SetCityConfigs(citiesConfig);
                 }
 
-                
+
                 Console.ReadKey();
                 Console.Clear();
             } while (true);
