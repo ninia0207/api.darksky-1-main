@@ -6,7 +6,7 @@ namespace Weather.PCL.Implementations
 {
     public class ImagesService : IImagesService
     {
-        private string _rootPath = @"C:\Users\davit\OneDrive\Desktop\api.darksky-1-main\Weather_images\";
+        private string _rootPath = @"C:\Users\Admin\Documents\GitHub\api.darksky-1-main\Weather_images\";
 
         public bool OpenImage(string name)
         {

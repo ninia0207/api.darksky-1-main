@@ -1,1 +1,8 @@
-[{"Id":1,"CityName":"Asia/Tbilisi","Lng":41.716667,"Lat":41.716667}]
+[
+  {
+    "Id": 1,
+    "CityName": "Asia/Tbilisi",
+    "Lng": 41.716667,
+    "Lat": 41.716667
+  }
+]

@@ -13,14 +13,17 @@ namespace Weather.PCL.Implementations
         public TempChoice Temperature = TempChoice.F;
         public MetersOrMiles MetersOrMiles = MetersOrMiles.mil;
         public IConfiguration configuration = new Configuration("config.json");
-
+        public IConfiguration langConfiguration = new Configuration("language.json");
         private string _languageCode;
 
+        
         public string LanguageCode
         {
             get { return _languageCode; }
-            set { 
-                if(value == "ka" || value == "en") _languageCode = value;
+            set {
+                var langConfigJson = langConfiguration.GetConfigs();
+                var langConfig = JsonConvert.DeserializeObject<WeatherConfig[]>(langConfigJson);
+                if (value == "ka" || value == "en") _languageCode = value;
                 else throw new ThisLanguageDoesnotExsistsExcaption();
             }
         }
