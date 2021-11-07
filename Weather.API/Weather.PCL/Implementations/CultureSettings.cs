@@ -4,6 +4,7 @@ using Newtonsoft.Json;
 using Weather.PCL.Abstractions;
 using Weather.PCL.Exceptions;
 using Weather.PCL.Models.Enums;
+using Weather.PCL.Models.Implementations;
 
 namespace Weather.PCL.Implementations
 {
@@ -22,9 +23,13 @@ namespace Weather.PCL.Implementations
             get { return _languageCode; }
             set {
                 var langConfigJson = langConfiguration.GetConfigs();
-                var langConfig = JsonConvert.DeserializeObject<WeatherConfig[]>(langConfigJson);
-                if (value == "ka" || value == "en") _languageCode = value;
-                else throw new ThisLanguageDoesnotExsistsExcaption();
+                var langConfig = JsonConvert.DeserializeObject<Language[]>(langConfigJson);
+                foreach (var item in langConfig)
+                {
+                    if (value == item.Code) _languageCode = value;
+                    else throw new ThisLanguageDoesnotExsistsExcaption();
+                }
+                
             }
         }
 
